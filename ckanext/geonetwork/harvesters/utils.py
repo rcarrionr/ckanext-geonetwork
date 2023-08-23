@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 #import re
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import zipfile
-from StringIO import StringIO
+from io import StringIO
 from lxml import etree
 
 GEONETWORK_V26 = "2.6"
@@ -32,13 +32,13 @@ class GeoNetworkClient(object):
                 #"Content-Type": "application/x-www-form-urlencoded",
                 #"Accept": "text/plain"
             #}
-            query = urllib.urlencode({
+            query = urllib.parse.urlencode({
                 "uuid": uuid
             })
 
             logger.info('Loading MEF for %s', uuid)
-            request = urllib2.Request(url, query)
-            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(), urllib2.HTTPRedirectHandler())
+            request = urllib.request.Request(url, query)
+            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(), urllib.request.HTTPRedirectHandler())
 
             response = opener.open(request)  # will get a ZIP file
             content = response.read()

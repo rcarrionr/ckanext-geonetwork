@@ -13,12 +13,14 @@ from ckan.plugins.core import SingletonPlugin
 from ckanext.spatial.lib.csw_client import CswService
 from ckanext.spatial.harvesters.csw import CSWHarvester
 
-from ckanext.spatial.model import ISODocument
-from ckanext.spatial.model import ISOElement
+# from ckanext.spatial.model import ISODocument
+# from ckanext.spatial.model import ISOElement
+from ckanext.spatial.harvested_metadata import ISODocument, ISOElement
+
 
 from ckan.logic import ValidationError, NotFound, get_action
 
-from pylons import config
+# from pylons import config
 from datetime import datetime
 
 log = logging.getLogger(__name__)
@@ -80,11 +82,11 @@ class GeoNetworkHarvester(CSWHarvester, SingletonPlugin):
 
             existing_keys = [entry.get('key') for entry in package_dict['extras']]
 
-            for key, value in default_extras.iteritems():
+            for key, value in list(default_extras.items()):
                 log.debug('Processing extra %s', key)
                 if not key in existing_keys or override_extras:
                     # Look for replacement strings
-                    if isinstance(value, basestring):
+                    if isinstance(value, str):
                         value = value.format(
                                harvest_source_id=str(harvest_object.job.source.id),
                                harvest_source_url=str(harvest_object.job.source.url).strip('/'),
@@ -180,9 +182,9 @@ class GeoNetworkHarvester(CSWHarvester, SingletonPlugin):
                         #else:
                         #validated_groups.append(group['id'])
                         validated_groups.append({'name': groupname})
-                    except NotFound, e:
+                    except NotFound as e:
                         log.warning('Group %s from category %s is not available' % (groupname, cat))
-        except Exception, e:
+        except Exception as e:
             log.warning('Error handling groups for metadata %s' % harvest_object.guid)
 
         return validated_groups
@@ -192,11 +194,10 @@ class GeoNetworkHarvester(CSWHarvester, SingletonPlugin):
             if 'OGC:WMS' in resource['resource_locator_protocol']:
                 resource['format'] = 'wms'
 
-                if config.get('ckanext.spatial.harvest.validate_wms', False):
-                    # Check if the service is a view service
-                    url = resource['url']
-                    test_url = url.split('?')[0] if '?' in url else url
-                    if self._is_wms(test_url):
-                        resource['verified'] = True
-                        resource['verified_date'] = datetime.now().isoformat()
-
+                # if config.get('ckanext.spatial.harvest.validate_wms', False):
+                #     # Check if the service is a view service
+                #     url = resource['url']
+                #     test_url = url.split('?')[0] if '?' in url else url
+                #     if self._is_wms(test_url):
+                #         resource['verified'] = True
+                #         resource['verified_date'] = datetime.now().isoformat()
